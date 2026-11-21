@@ -1,0 +1,29 @@
+services:
+  xiaohongshu-mcp:
+    # 本地构建的原生架构镜像（Debian 官方源开源 Chromium，零 QEMU 模拟、零第三方 CDN 浏览器）
+    image: ${XHS_MCP_IMAGE:-xhs-ai-ops-mcp:arm64}
+    platform: ${XHS_DOCKER_PLATFORM:-linux/arm64}
+    container_name: xhs-ai-ops-mcp
+    restart: unless-stopped
+    # Chromium 在容器内运行需足够共享内存，防止页面崩溃
+    shm_size: "1gb"
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      # 严格仅监听本机回环地址，绝不对局域网或公网暴露
+      - "${XHS_MCP_ADDR:-127.0.0.1:18060}:18060"
+    environment:
+      - TZ=Asia/Shanghai
+      - COOKIES_PATH=/app/data/cookies.json
+      - HOME=/app/data/home
+      - XDG_CONFIG_HOME=/app/data/config
+      - XHS_BROWSER_BIN=/usr/bin/chromium
+      - AUTH_TOKEN=${AUTH_TOKEN:-}
+      - XHS_PROXY=${XHS_PROXY:-}
+    volumes:
+      # 1. 仅持久化小红书登录会话与容器内浏览器配置（与宿主机其他文件完全隔离）
+      - ../.runtime/mcp-data:/app/data
+      # 2. 将工单目录以“与宿主机一致的绝对路径”只读挂载进容器：
+      #    - 宿主机生成的本地图片绝对路径可直接传给 publish_content，无需任何路径转换
+      #    - 容器仅有只读权限（:ro），无法修改或删除宿主机任何文件
+      - ../workspace/posts:${XHS_OPS_ROOT}/workspace/posts:ro

@@ -1,0 +1,32 @@
+# 上游第三方开源仓库（运行 ./infra/bootstrap.sh 一键拉取，不纳入主仓库）
+upstream/
+
+# 运行时会话与敏感凭证（严禁提交）
+config/.env
+.baoyu-skills/.env
+.runtime/
+cookies.json
+
+# 个人专属本地覆盖资产
+config/avatar-*.png
+config/persona.local.md
+
+# 本地虚拟环境与编译产物
+.venv/
+infra/bin/
+
+# 本地生成的运行期工单与缓存
+workspace/posts/*
+!workspace/posts/.gitkeep
+
+# 知识库细分记录默认仅本地沉淀（保留总览入口与目录骨架）
+knowledge-base/accounts/*.md
+knowledge-base/topics/*.md
+knowledge-base/patterns/*.md
+knowledge-base/actions/*.md
+knowledge-base/reviews/*.md
+!knowledge-base/**/.gitkeep
+
+# 系统文件
+.DS_Store
+*.log
