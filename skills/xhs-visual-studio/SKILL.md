@@ -61,9 +61,9 @@ description: >-
 **铁律：未获用户确认第 1 张封面图前，严禁批量生成第 2..N 张！**（除非用户在当前指令明确写出 `--yes` / “跳过确认直接生成全套”。）
 
 1. 先单独生成第 1 张封面（**不带 `--ref`**，以确立全套视觉锚点）：
-   - **默认优先（付费 Google API）**：
+   - **默认优先（付费 Google API，Windows / macOS / Linux 通用；macOS/Linux 若无 `python` 可用 `python3`）**：
      ```bash
-     <XHS_OPS_ROOT>/infra/gen-image.sh \
+     python <XHS_OPS_ROOT>/infra/ops.py gen-image \
        --provider google \
        --ar 3:4 \
        --quality 2k \
@@ -74,7 +74,7 @@ description: >-
      - 若 `GOOGLE_API_KEY` 免费层返回 `429 limit: 0`，优先无缝回退至宿主原生 `image-generator`（如 Antigravity 内置生图引擎）；
      - 若原生引擎也遇到并发配额限制，可使用本机已登录的 `codex-cli` 跨引擎补齐单页，同样完整支持 `--ref 01-cover.png` 首图锚定：
        ```bash
-       <XHS_OPS_ROOT>/infra/gen-image.sh \
+       python <XHS_OPS_ROOT>/infra/ops.py gen-image \
          --provider codex-cli \
          --ar 3:4 \
          --ref "<工单目录>/05_images/01-cover.png" \
@@ -109,7 +109,7 @@ description: >-
    ```
 2. 执行批量并发生成（自动限流 + 单张失败自动重试 3 次，不重跑已成功页）：
    ```bash
-   <XHS_OPS_ROOT>/infra/gen-image.sh \
+   python <XHS_OPS_ROOT>/infra/ops.py gen-image \
      --batchfile "<工单目录>/04_prompts/batch.json" \
      --jobs 4
    ```

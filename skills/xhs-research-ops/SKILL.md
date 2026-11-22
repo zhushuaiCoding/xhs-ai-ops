@@ -26,17 +26,17 @@ description: >-
 
 ## 数据采集双通道严格边界
 
-1. **站外热点采集（必须走安全封装脚本）**：
+1. **站外热点采集（必须走安全封装命令，Windows / macOS / Linux 通用）**：
    ```bash
-   <XHS_OPS_ROOT>/infra/reach.sh github search "AI agent" --limit 5
-   <XHS_OPS_ROOT>/infra/reach.sh bilibili search "AI 工作流" --limit 5
-   <XHS_OPS_ROOT>/infra/reach.sh youtube search "AI coding workflow" --limit 5
-   <XHS_OPS_ROOT>/infra/reach.sh v2ex hot --limit 10
-   <XHS_OPS_ROOT>/infra/reach.sh read "<站外文章或视频链接>"
+   python <XHS_OPS_ROOT>/infra/ops.py reach github search "AI agent" --limit 5
+   python <XHS_OPS_ROOT>/infra/ops.py reach bilibili search "AI 工作流" --limit 5
+   python <XHS_OPS_ROOT>/infra/ops.py reach youtube search "AI coding workflow" --limit 5
+   python <XHS_OPS_ROOT>/infra/ops.py reach v2ex hot --limit 10
+   python <XHS_OPS_ROOT>/infra/ops.py reach read "<站外文章或视频链接>"
    ```
-   - `infra/reach.sh` 默认拦截小红书渠道以保护主号，绝不绕过。
+   - `infra/ops.py reach`（及兼容封装 `infra/reach.sh`）默认拦截小红书渠道以保护主号，绝不绕过；macOS/Linux 若无 `python` 可用 `python3`。
 2. **小红书站内采集（必须走 `xiaohongshu-mcp` 工具）**：
-   - 先确认会话可用：`check_login_status`（如未登录，可调 `get_login_qrcode` 获取二维码供用户扫码，或提示用户在终端运行 `<XHS_OPS_ROOT>/infra/login-xhs.sh`）。
+   - 先确认会话可用：`check_login_status`（如未登录，可调 `get_login_qrcode` 获取二维码供用户扫码，或提示用户在终端运行 `python <XHS_OPS_ROOT>/infra/ops.py login`）。
    - 首页推荐流：`list_feeds`
    - 站内关键词检索：`search_feeds`（支持 `filters.sort_by` 如`最多点赞`/`最多收藏`/`最新`，`filters.note_type="图文"`，`filters.publish_time="一周内"`）
    - 单帖详情与高赞评论：`get_feed_detail`（传入列表返回的 `feed_id` 与 `xsec_token`）

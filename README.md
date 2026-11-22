@@ -87,17 +87,12 @@ xhs-ai-ops/
 │   ├── persona.md                   # AI 垂类人设、内容支柱、去报告腔语感与合规红线
 │   ├── brand-visual.md              # 3:4 双轨视觉母版、色板与出图策略
 │   └── .env.example                 # 环境变量模板（真实 .env 自动被 .gitignore 忽略）
-├── infra/                           # 模块 0：基础设施编排、Docker 安全沙箱与自检脚本
-│   ├── bootstrap.sh                 # 一键拉取 5 个上游仓库至 upstream/ 并安装 .venv
-│   ├── Dockerfile.arm64             # 原生架构沙箱镜像（Debian 官方开源 Chromium）
-│   ├── build-arm64-image.sh         # 自动识别 arm64/amd64 编译并打包（含 2026 创作者中心兼容）
-│   ├── docker-compose.yml           # 仅绑定 127.0.0.1 + 工单目录只读挂载 (:ro) + 禁提权
-│   ├── start-mcp.sh                 # 容器托管：start | stop | restart | status | logs
-│   ├── login-xhs.sh                 # 容器无界面二维码扫码登录（宿主机绝不弹第三方浏览器）
-│   ├── reach.sh                     # Agent-Reach 封装（内置单主号风控护盾 + macOS SSL 修复）
-│   ├── gen-image.sh                 # baoyu-image-gen 统一出图封装（支持 Gemini / codex-cli 等 12 后端）
-│   ├── install-skills.sh            # 一键注册 Skills & MCP 到 Antigravity / Claude / Codex / OpenClaw
-│   └── doctor.sh                    # 全链路 13 项环境一键健康体检
+├── infra/                           # 模块 0：跨平台基础设施编排、Docker 安全沙箱与自检脚本
+│   ├── ops.py                       # 跨平台统一运维引擎（Windows 11 / macOS / Linux 通用，纯 Python 零外部依赖）
+│   ├── ops.cmd                      # Windows 便捷启动包装（PowerShell / CMD 直接调用）
+│   ├── Dockerfile.arm64             # 原生架构（amd64/arm64）沙箱镜像模板（Debian 官方开源 Chromium）
+│   ├── docker-compose.yml           # 仅绑定 127.0.0.1 + 工单目录只读挂载（/app/posts:ro）+ 禁提权
+│   └── *.sh                         # macOS / Linux 兼容封装脚本（统一委托给 ops.py）
 ├── knowledge-base/                  # 模块 1：五分类长期运营记忆库（本地沉淀，自动忽略隐私文件）
 │   ├── README.md                    # 总览入口与检索铁律
 │   ├── accounts/                    # 账号五维体检基线
@@ -118,39 +113,47 @@ xhs-ai-ops/
 
 ---
 
-## 五、3 分钟快速上手
+## 五、3 分钟快速上手（Windows 11 / macOS / Linux 通用）
 
 ### 前置要求
-- `Git`、`Python 3.10+`、`Node.js 18+`（提供 `npx`）、`Go 1.24+`、`Docker`（Docker Desktop / OrbStack / Linux Docker）
+- **必装**：`Git`、`Python 3.10+`、`Node.js 18+`（提供 `npx` 或装 `bun`）、`Docker`（Windows 11 安装 **Docker Desktop + WSL2 后端**；macOS 安装 Docker Desktop / OrbStack）
+- **免装 Go**：若宿主机未安装 Go（或版本低于 `go.mod` 要求），`ops.py` 会自动走 Docker 多阶段容器编译，无需手动配置 Go 环境
 - 任一支持 Agent Skills 与 MCP 的 AI 客户端（如 **Antigravity**、`Claude Code`、`Codex`、`OpenClaw`）
 
-### 第 1 步：克隆并一键初始化上游底座
+### Windows 11（PowerShell）一键部署
+```powershell
+git clone https://github.com/zhushuaiCoding/xhs-ai-ops.git
+cd xhs-ai-ops
+
+# 1. 拉齐 5 个上游仓库并初始化独立 .venv（Agent-Reach）
+python infra/ops.py bootstrap
+
+# 2. 启动原生 linux/amd64 安全沙箱（先打开 Docker Desktop；首次运行自动在容器内编译 Go 并装 Debian 官方 Chromium）
+python infra/ops.py start
+
+# 3. 无界面二维码扫码登录小红书主号（弹出纯 PNG 图片，手机小红书 App 扫码即可）
+python infra/ops.py login
+
+# 4. 自动注册 5 个 Skills（目录联接）与 xiaohongshu-mcp 到 Antigravity
+python infra/ops.py install-skills
+
+# 5. 全链路 13 项健康体检
+python infra/ops.py doctor
+```
+
+### macOS / Linux 一键部署
 ```bash
 git clone https://github.com/zhushuaiCoding/xhs-ai-ops.git
 cd xhs-ai-ops
+
 ./infra/bootstrap.sh
-```
-> 脚本会自动拉齐 5 个上游仓库到 `upstream/`、创建隔离的 `.venv` 安装 `Agent-Reach`，并生成 `config/.env`。按需在 `config/.env`（或系统环境变量）中填写生图密钥（如 `GOOGLE_API_KEY`），也可使用宿主内置生图引擎或 `codex-cli`。
-
-### 第 2 步：启动原生 Docker 安全沙箱并扫码登录主号
-先确保本地 **Docker Desktop** 已启动，再执行：
-```bash
-# 首次运行自动识别本机架构（arm64/amd64）构建基于 Debian 官方开源 Chromium 的原生沙箱镜像
 ./infra/start-mcp.sh start
-
-# 从容器拉取纯二维码 PNG 并用系统预览打开，手机小红书 App 扫码即可（宿主机零第三方浏览器）
 ./infra/login-xhs.sh
-```
-> ⚠️ **单主号安全铁律**：扫码登录后，请勿再在其他电脑网页端登录同一小红书主号（会触发会话互踢）；日常查看主页、预览`仅自己可见`笔记或改资料请直接使用手机端 App。
-
-### 第 3 步：注册 Skills 与 MCP 并执行一键体检
-```bash
-# 默认注册到 Antigravity（支持 --target antigravity|claude|codex|openclaw|all）
 ./infra/install-skills.sh
-
-# 一键体检（确认全部绿灯、宿主机零非官方浏览器残留）
 ./infra/doctor.sh
 ```
+> 提示：macOS / Linux 同样可以直接使用 `python3 infra/ops.py <bootstrap|start|login|install-skills|doctor>`；按需在 `config/.env`（或系统环境变量）中填写 `GOOGLE_API_KEY`，也可直接走宿主内置生图引擎或 `codex-cli`。
+> ⚠️ **单主号安全铁律**：迁移到新电脑（如远程 Windows 11）扫码登录主号后，请务必停掉原电脑上的 `xhs-ai-ops-mcp` 容器（`python3 infra/ops.py stop`），避免双端网页会话互踢触发风控；日常查看主页、预览`仅自己可见`笔记请直接使用手机端 App。
 
 ---
 

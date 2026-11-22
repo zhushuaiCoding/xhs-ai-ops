@@ -7,7 +7,7 @@ description: >-
 
 # 小红书 AI 全链路运营总控编排器（模块 6）
 
-> 路径约定：下文中 `<XHS_OPS_ROOT>` 指 `xhs-ai-ops` 项目根目录（即本技能 `SKILL.md` 所在目录的上两级，如 `./xhs-ai-ops`）。
+> 路径与命令约定：下文中 `<XHS_OPS_ROOT>` 指 `xhs-ai-ops` 项目根目录（即本技能 `SKILL.md` 所在目录的上两级，如 `./xhs-ai-ops`）；跨平台命令统一使用 `python <XHS_OPS_ROOT>/infra/ops.py <子命令>`（macOS/Linux 若无 `python` 可用 `python3`）。
 
 
 你负责统筹 `xhs-ai-ops` 工作台的端到端流水线，串联 5 个专业业务模块与 4 道人工确认关卡，确保账号风格统一、主号安全不触风控、中间产物可随时人工编辑与断点续跑。
@@ -43,7 +43,7 @@ description: >-
 1. **先读全局上下文**：阅读 `config/persona.md`、`config/brand-visual.md` 与 `knowledge-base/README.md`，避免每次从零摸索。
 2. **按需体检底座**：若本次任务涉及小红书读写或生图且状态未知，可先运行：
    ```bash
-   <XHS_OPS_ROOT>/infra/doctor.sh
+   python <XHS_OPS_ROOT>/infra/ops.py doctor
    ```
 3. **初始化工单目录与状态文件**：
    - 创建 `workspace/posts/<YYYY-MM-DD>-<slug>/`（含 `04_prompts/`、`05_images/` 子目录）。

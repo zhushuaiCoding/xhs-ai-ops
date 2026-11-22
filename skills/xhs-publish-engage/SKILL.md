@@ -27,9 +27,9 @@ description: >-
 ## 子流程 A：安全发布图文 / 视频（Gate 3）
 
 ### 1. 发布前强制预检
-1. 调用 MCP 工具 `check_login_status` 确认主号在线；若掉线则停止发布，可调用 `get_login_qrcode` 获取二维码让用户手机扫码，或提示用户在终端运行 `<XHS_OPS_ROOT>/infra/login-xhs.sh` 扫码续期。
+1. 调用 MCP 工具 `check_login_status` 确认主号在线；若掉线则停止发布，可调用 `get_login_qrcode` 获取二维码让用户手机扫码，或提示用户在终端运行 `python <XHS_OPS_ROOT>/infra/ops.py login` 扫码续期。
 2. 读取工单 `02_copy_draft.md` 与 `05_images/`，逐项核验：
-   - **封面与配图**：全部为本地存在的绝对路径，按 `01-cover.png`、`02-*.png` 顺序排列，至少 1 张。
+   - **封面与配图**：全部为工单目录内已存在的图片路径（直接传宿主机绝对路径如 `D:\...\workspace\posts\<slug>\05_images\01-cover.png`、`/Users/.../workspace/posts/...` 或容器路径 `/app/posts/<slug>/05_images/01-cover.png` 均可，容器内会自动归一化映射至只读卷 `/app/posts`），按 `01-cover.png`、`02-*.png` 顺序排列，至少 1 张。
    - **标题**：严格 `≤ 20` 个中文字/字符。
    - **正文**：严格 `≤ 1000` 字，且**不包含 `#` 开头的标签文本**。
    - **标签 `tags`**：独立字符串数组（5–8 个）。

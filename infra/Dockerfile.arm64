@@ -1,5 +1,5 @@
-# 原生 linux/arm64 安全沙箱镜像（基于本地已有 Debian Bookworm arm64 镜像 + 官方源开源 Chromium，零 QEMU、零第三方 CDN 浏览器）
-FROM python:3.12-slim-bookworm
+# 原生架构（linux/amd64 & linux/arm64）安全沙箱镜像（Debian 官方源开源 Chromium，零 QEMU、零第三方 CDN 浏览器）
+FROM debian:bookworm-slim
 
 ENV TZ=Asia/Shanghai
 ENV DEBIAN_FRONTEND=noninteractive
@@ -19,7 +19,7 @@ RUN sed -i 's|deb.debian.org|mirrors.aliyun.com|g' /etc/apt/sources.list.d/debia
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-RUN mkdir -p /app/data/home /app/data/config /app/images && chmod -R 777 /app/data /app/images
+RUN mkdir -p /app/data/home /app/data/config /app/images /app/posts && chmod -R 777 /app/data /app/images
 
 COPY app /app/app
 RUN chmod +x /app/app
